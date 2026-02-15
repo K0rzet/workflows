@@ -5,39 +5,57 @@ source /venv/main/bin/activate
 WORKSPACE=${WORKSPACE:-/workspace}
 COMFYUI_DIR="${WORKSPACE}/ComfyUI"
 
-echo "=== ComfyUI запускает Z-Image Turbo I2I ==="
+echo "=== ComfyUI: Brand Model I2I (SDXL + FaceID + ControlNet) ==="
 
 APT_PACKAGES=()
-PIP_PACKAGES=()
+PIP_PACKAGES=(
+    "insightface"
+    "onnxruntime-gpu"
+)
 
 NODES=(
-    "https://github.com/Koko-boya/Comfyui-Z-Image-Utilities"
+    "https://github.com/cubiq/ComfyUI_IPAdapter_plus"
+    "https://github.com/Fannovel16/comfyui_controlnet_aux"
+    "https://github.com/ltdrdata/ComfyUI-Impact-Pack"
     "https://github.com/kijai/ComfyUI-KJNodes"
     "https://github.com/cubiq/ComfyUI_essentials"
     "https://github.com/rgthree/rgthree-comfy"
 )
 
 # ══════════════════════════════════════════════════════
-# Z-Image Turbo — модели
+# МОДЕЛИ — Juggernaut XL v9 (SDXL, NSFW-ready)
 # ══════════════════════════════════════════════════════
 
-# Diffusion Model — Z-Image Turbo BF16 (12.3 GB)
-# https://huggingface.co/Comfy-Org/z_image_turbo
-DIFFUSION_MODELS=(
-    "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors"
+CHECKPOINTS=(
+    "https://huggingface.co/RunDiffusion/Juggernaut-XL-v9/resolve/main/Juggernaut-XL_v9_RunDiffusionPhoto_v2.safetensors"
 )
 
-# Text Encoder — Qwen 3 4B (8 GB)
-# Используется как CLIP encoder для Z-Image
-TEXT_ENCODERS=(
-    "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors"
+# ══════════════════════════════════════════════════════
+# IP-ADAPTER FACEID — сохранение лица из референсов
+# ══════════════════════════════════════════════════════
+
+# FaceID Plus v2 SDXL — основная модель (1.5 GB)
+# + LoRA для FaceID (372 MB)
+IPADAPTER_MODELS=(
+    "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sdxl.bin"
+    "https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sdxl_lora.safetensors"
 )
 
-# VAE — ae.safetensors (Flux 1 VAE, 335 MB)
-# Стандартный VAE, совместимый с Flux и Z-Image
-VAE_MODELS=(
-    "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors"
-)
+# ══════════════════════════════════════════════════════
+# CONTROLNET — контроль позы через OpenPose
+# ══════════════════════════════════════════════════════
+
+# xinsir OpenPose SDXL ProMax (~2.5 GB)
+# https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0
+# Требует rename при скачивании (см. ниже)
+
+# ══════════════════════════════════════════════════════
+# CLIP VISION — энкодер для IP-Adapter
+# ══════════════════════════════════════════════════════
+
+# CLIP-ViT-H для FaceID Plus v2
+# https://huggingface.co/h94/IP-Adapter
+# Требует rename при скачивании (см. ниже)
 
 ### ─────────────────────────────────────────────
 ### DO NOT EDIT BELOW UNLESS YOU KNOW WHAT YOU ARE DOING
@@ -46,9 +64,9 @@ VAE_MODELS=(
 function provisioning_start() {
     echo ""
     echo "##############################################"
-    echo "#  Z-Image Turbo I2I — Brand Photography     #"
-    echo "#  Image-to-Image для брендов и рекламы       #"
-    echo "#  OFM HUB setup 2025-2026                    #"
+    echo "#  OFM HUB — Brand Model I2I Workflow         #"
+    echo "#  SDXL + FaceID + ControlNet OpenPose         #"
+    echo "#  Полный контроль: лицо, поза, одежда, NSFW   #"
     echo "##############################################"
     echo ""
 
@@ -58,15 +76,49 @@ function provisioning_start() {
     provisioning_get_nodes
     provisioning_get_pip_packages
 
-    provisioning_get_files "${COMFYUI_DIR}/models/diffusion_models"   "${DIFFUSION_MODELS[@]}"
-    provisioning_get_files "${COMFYUI_DIR}/models/text_encoders"      "${TEXT_ENCODERS[@]}"
-    provisioning_get_files "${COMFYUI_DIR}/models/vae"                "${VAE_MODELS[@]}"
+    # Стандартные загрузки (имя файла из URL)
+    provisioning_get_files "${COMFYUI_DIR}/models/checkpoints"   "${CHECKPOINTS[@]}"
+    provisioning_get_files "${COMFYUI_DIR}/models/ipadapter"     "${IPADAPTER_MODELS[@]}"
+
+    # Загрузки с переименованием (generic имена на HuggingFace)
+    download_and_rename \
+        "https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors" \
+        "${COMFYUI_DIR}/models/clip_vision" \
+        "CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"
+
+    download_and_rename \
+        "https://huggingface.co/xinsir/controlnet-openpose-sdxl-1.0/resolve/main/diffusion_pytorch_model_promax.safetensors" \
+        "${COMFYUI_DIR}/models/controlnet" \
+        "controlnet-openpose-sdxl-promax.safetensors"
 
     echo ""
-    echo "Z-Image Turbo I2I настроен → Starting ComfyUI..."
+    echo "Brand Model I2I настроен → Starting ComfyUI..."
     echo ""
 }
 
+function download_and_rename() {
+    local url="$1"
+    local dir="$2"
+    local filename="$3"
+
+    mkdir -p "$dir"
+    local target="${dir}/${filename}"
+
+    if [[ -f "$target" ]]; then
+        echo "Уже существует: $target"
+        return
+    fi
+
+    echo "→ Скачиваем ${filename}..."
+
+    local auth_header=""
+    if [[ -n "$HF_TOKEN" && "$url" =~ huggingface\.co ]]; then
+        auth_header="--header=Authorization: Bearer $HF_TOKEN"
+    fi
+
+    wget $auth_header --show-progress -e dotbytes=4M -O "$target" "$url" || echo " [!] Download failed: $url"
+    echo ""
+}
 
 function provisioning_clone_comfyui() {
     if [[ ! -d "${COMFYUI_DIR}" ]]; then
@@ -150,6 +202,6 @@ if [[ ! -f /.noprovisioning ]]; then
 fi
 
 # Запуск ComfyUI
-echo "=== Запускаем ComfyUI с Z-Image Turbo I2I ==="
+echo "=== Запускаем ComfyUI: Brand Model I2I ==="
 cd "${COMFYUI_DIR}"
 python main.py --listen 0.0.0.0 --port 8188
