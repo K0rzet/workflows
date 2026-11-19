@@ -1,0 +1,191 @@
+{
+    "revision":  0,
+    "last_node_id":  2,
+    "last_link_id":  1,
+    "nodes":  [
+                  {
+                      "id":  1,
+                      "type":  "ComixesTrainLora",
+                      "pos":  [
+                                  40,
+                                  40
+                              ],
+                      "size":  [
+                                   460,
+                                   280
+                               ],
+                      "flags":  {
+
+                                },
+                      "order":  1,
+                      "mode":  0,
+                      "inputs":  [
+                                     {
+                                         "name":  "character",
+                                         "type":  "STRING",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "character"
+                                                    }
+                                     },
+                                     {
+                                         "name":  "model_family",
+                                         "type":  "COMBO",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "model_family"
+                                                    }
+                                     },
+                                     {
+                                         "name":  "steps",
+                                         "type":  "INT",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "steps"
+                                                    }
+                                     },
+                                     {
+                                         "name":  "rank",
+                                         "type":  "INT",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "rank"
+                                                    }
+                                     },
+                                     {
+                                         "name":  "alpha",
+                                         "type":  "FLOAT",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "alpha"
+                                                    }
+                                     },
+                                     {
+                                         "name":  "lr",
+                                         "type":  "FLOAT",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "lr"
+                                                    }
+                                     },
+                                     {
+                                         "name":  "resolution",
+                                         "type":  "INT",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "resolution"
+                                                    }
+                                     },
+                                     {
+                                         "name":  "save_every",
+                                         "type":  "INT",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "save_every"
+                                                    }
+                                     }
+                                 ],
+                      "outputs":  [
+                                      {
+                                          "name":  "IMAGE",
+                                          "type":  "IMAGE",
+                                          "links":  [
+                                                        1
+                                                    ],
+                                          "slot_index":  0
+                                      },
+                                      {
+                                          "name":  "STRING",
+                                          "type":  "STRING",
+                                          "links":  [
+
+                                                    ],
+                                          "slot_index":  1
+                                      }
+                                  ],
+                      "properties":  {
+                                         "Node name for S\u0026R":  "ComixesTrainLora"
+                                     },
+                      "widgets_values":  [
+                                             "vera.json",
+                                             "wai",
+                                             1600,
+                                             32,
+                                             32,
+                                             0.0001,
+                                             1024,
+                                             400
+                                         ],
+                      "title":  "WAI v17 character+style LoCon: 1024px, rank 32, snapshots 400/800/1200/1600"
+                  },
+                  {
+                      "id":  2,
+                      "type":  "SaveImage",
+                      "pos":  [
+                                  560,
+                                  40
+                              ],
+                      "size":  [
+                                   360,
+                                   120
+                               ],
+                      "flags":  {
+
+                                },
+                      "order":  2,
+                      "mode":  0,
+                      "inputs":  [
+                                     {
+                                         "name":  "images",
+                                         "type":  "IMAGE",
+                                         "link":  1
+                                     },
+                                     {
+                                         "name":  "filename_prefix",
+                                         "type":  "STRING",
+                                         "link":  null,
+                                         "widget":  {
+                                                        "name":  "filename_prefix"
+                                                    }
+                                     }
+                                 ],
+                      "outputs":  [
+                                      {
+                                          "name":  "IMAGE",
+                                          "type":  "IMAGE",
+                                          "links":  [
+
+                                                    ],
+                                          "slot_index":  0
+                                      }
+                                  ],
+                      "properties":  {
+                                         "Node name for S\u0026R":  "SaveImage"
+                                     },
+                      "widgets_values":  [
+                                             "comixes/lora_status"
+                                         ],
+                      "title":  "Статус. Сама LoRA лежит в models/loras, имя из карточки."
+                  }
+              ],
+    "links":  [
+                  {
+                      "id":  1,
+                      "origin_id":  1,
+                      "origin_slot":  0,
+                      "target_id":  2,
+                      "target_slot":  0,
+                      "type":  "IMAGE"
+                  }
+              ],
+    "groups":  [
+
+               ],
+    "config":  {
+
+               },
+    "extra":  {
+
+              },
+    "version":  0.4
+}
