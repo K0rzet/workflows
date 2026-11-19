@@ -1,0 +1,12 @@
+{
+  "name": "Kira",
+  "trigger": "chr_kira",
+  "lora": "kira.safetensors",
+  "lora_strength_model": 0.85,
+  "lora_strength_clip": 0.75,
+  "age_anchor": "adult woman, 28 years old, mature female",
+  "appearance": "tan skin, short black hair with a white streak, green eyes, athletic build, wide hips, defined jaw, full lips, adult proportions, small scar through the left eyebrow",
+  "default_outfit": "a red short jacket, a white shirt, dark pants, boots",
+  "style": "",
+  "negative_extra": ""
+}
