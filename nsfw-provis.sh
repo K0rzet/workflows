@@ -10,7 +10,7 @@ export WORKSPACE="${WORKSPACE:-/workspace}"
 export COMFYUI_DIR="${COMFYUI_DIR:-${WORKSPACE}/ComfyUI}"
 export COMIXES_PROJECT="${COMIXES_PROJECT:-${WORKSPACE}/comixes-workflow}"
 export COMIXES_REPO_URL="https://github.com/K0rzet/workflows.git"
-export COMIXES_REF="${COMIXES_REF:-7cd36d06a86d7d1b820730471432734cac7909cf}"
+export COMIXES_REF="${COMIXES_REF:-5e075704183a7611bb3163e7b6370f9366bb15ee}"
 
 export PORT="${PORT:-8188}"
 export GPU_PROFILE="${GPU_PROFILE:-auto}"
